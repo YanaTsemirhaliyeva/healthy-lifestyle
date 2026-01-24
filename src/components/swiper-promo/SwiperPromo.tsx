@@ -11,12 +11,12 @@ export const SwiperPromo = () => {
   const promoList = [
     {
       id: 1,
-      src: 'img/banner/cornflowers-2.jpg',
+      src: 'img/banner/cornflowers-2.webp',
       title: 'Кожная пятница - роднае сваё'
     },
         {
       id: 2,
-      src: 'img/banner/pink-flowers.jpg',
+      src: 'img/banner/pink-flowers.webp',
       title: '2026 - Год белорусской женщины'
     }
   ];

@@ -18,10 +18,11 @@ import {
 import { useState } from 'react';
 import { Link } from 'react-router';
 
-import { 
-    ORGANIZM_NEEDS, 
-    PSY_TEST_PROJECTIVE, 
-    PSYCHOLOGICAL_STATE} from '~/consts/consts';
+import {
+    ORGANIZM_NEEDS,
+    PSY_TEST_PROJECTIVE,
+    PSYCHOLOGICAL_STATE
+} from '~/consts/consts';
 
 // Типы
 type Test = {
@@ -107,16 +108,16 @@ export const Projective = () => {
 
     // Обработчик для Accordion - разрешаем несколько открытых одновременно
     const handleAccordionChange = (index: number | number[]) => {
-    if (typeof index === 'number') {
-        setExpandedTest(index); // Просто число
-    } else if (Array.isArray(index) && index.length > 0) {
-        setExpandedTest(index[0]); // Берем первый элемент
-    } else {
-        setExpandedTest(null); // Закрываем все
-    }
-};
+        if (typeof index === 'number') {
+            setExpandedTest(index); // Просто число
+        } else if (Array.isArray(index) && index.length > 0) {
+            setExpandedTest(index[0]); // Берем первый элемент
+        } else {
+            setExpandedTest(null); // Закрываем все
+        }
+    };
     return (
-        <Container maxW="6xl" pb={8} pt={{sm: 8}}>
+        <Container maxW="6xl" pb={8} pt={{ sm: 8 }}>
             <Button as={Link} to="/" mb={6} colorScheme="teal" variant="outline">
                 ← Назад к тестам
             </Button>
@@ -131,34 +132,34 @@ export const Projective = () => {
             </Text>
 
             {/* Аккордеон - все тесты изначально закрыты */}
-            <Accordion 
+            <Accordion
                 allowToggle// Разрешаем открывать несколько тестов одновременно
                 index={expandedTest !== null ? [expandedTest] : []}
                 onChange={handleAccordionChange}
             >
                 {PSY_TEST_PROJECTIVE.map((test: Test) => (
-                    <AccordionItem 
-                        key={test.id} 
-                        border="1px solid" 
-                        borderColor="gray.200" 
-                        borderRadius="lg" 
+                    <AccordionItem
+                        key={test.id}
+                        border="1px solid"
+                        borderColor="gray.200"
+                        borderRadius="lg"
                         mb={4}
                     >
                         <h2>
-                            <AccordionButton 
+                            <AccordionButton
                                 py={4}
                                 _hover={{ bg: 'gray.50' }}
-                                _expanded={{ 
-                                    bg: 'teal.50', 
-                                    borderBottom: '1px solid', 
+                                _expanded={{
+                                    bg: 'teal.50',
+                                    borderBottom: '1px solid',
                                     borderColor: 'gray.200',
                                     borderRadius: 'lg lg 0 0'
                                 }}
                             >
                                 <Box flex="1" textAlign="left">
                                     <Flex align="center" gap={3}>
-                                        <Badge 
-                                            colorScheme={isTestCompleted(test.id) ? "green" : "teal"} 
+                                        <Badge
+                                            colorScheme={isTestCompleted(test.id) ? "green" : "teal"}
                                             fontSize="md"
                                             display="flex"
                                             alignItems="center"
@@ -178,13 +179,13 @@ export const Projective = () => {
                             </AccordionButton>
                         </h2>
                         <AccordionPanel pb={6} pt={4}>
-                            <TestContent 
+                            <TestContent
                                 test={test}
                                 isCompleted={isTestCompleted(test.id)}
                                 result={getTestResult(test.id)}
-                                onSelect={test.id === 1 ? handleTest1Select : 
-                                         test.id === 2 ? handleTest2Select : 
-                                         () => {}}
+                                onSelect={test.id === 1 ? handleTest1Select :
+                                    test.id === 2 ? handleTest2Select :
+                                        () => { }}
                                 onReset={() => resetTest(test.id)}
                             />
                         </AccordionPanel>
@@ -214,18 +215,18 @@ export const Projective = () => {
 
 // Компонент содержимого теста
 const TestContent = ({ test, isCompleted, result, onSelect, onReset }: TestContentProps) => (
-        <Box>
-            <Text color="gray.700" mb={6}>
-                {test.desc}
-            </Text>
+    <Box>
+        <Text color="gray.700" mb={6}>
+            {test.desc}
+        </Text>
 
-            {!isCompleted ? (
-                <TestUncompletedContent test={test} onSelect={onSelect} />
-            ) : (
-                <TestResultContent test={test} result={result} onReset={onReset} />
-            )}
-        </Box>
-    );
+        {!isCompleted ? (
+            <TestUncompletedContent test={test} onSelect={onSelect} />
+        ) : (
+            <TestResultContent test={test} result={result} onReset={onReset} />
+        )}
+    </Box>
+);
 
 // Контент непройденного теста
 const TestUncompletedContent = ({ test, onSelect }: { test: Test; onSelect: (id: number) => void }) => {
@@ -238,7 +239,7 @@ const TestUncompletedContent = ({ test, onSelect }: { test: Test; onSelect: (id:
                     </Text>
                     <SimpleGrid columns={{ base: 2, sm: 3, md: 3 }} spacing={4}>
                         {PSYCHOLOGICAL_STATE.map((image: ImageItem) => (
-                            <ImageCard 
+                            <ImageCard
                                 key={image.id}
                                 image={image}
                                 onClick={() => onSelect(image.id)}
@@ -253,7 +254,7 @@ const TestUncompletedContent = ({ test, onSelect }: { test: Test; onSelect: (id:
                     <Text fontWeight="bold" mb={4} color="gray.800">
                         Расслабьтесь, посмотрите на картинку 10 секунд. Что вы увидели самым первым?
                     </Text>
-                    
+
                     <Flex direction={{ base: 'column', md: 'row' }} gap={8}>
                         <Box flex="1">
                             {test.src && (
@@ -266,11 +267,11 @@ const TestUncompletedContent = ({ test, onSelect }: { test: Test; onSelect: (id:
                                 />
                             )}
                         </Box>
-                        
+
                         <Box flex="1">
                             <VStack spacing={4} align="stretch">
                                 {ORGANIZM_NEEDS.map((option: OptionItem) => (
-                                    <OptionButton 
+                                    <OptionButton
                                         key={option.id}
                                         option={option}
                                         onClick={() => onSelect(option.id)}
@@ -292,78 +293,78 @@ const TestUncompletedContent = ({ test, onSelect }: { test: Test; onSelect: (id:
 
 // Контент с результатами теста
 const TestResultContent = ({ test, result, onReset }: { test: Test; result: TestResult; onReset: () => void }) => (
-        <Box>
-            <Flex justify="space-between" align="center" mb={4}>
-                <Heading size="lg" color="teal.700">
-                    🎯 Ваш результат
-                </Heading>
-                <Button
-                    size="sm"
-                    colorScheme="teal"
-                    variant="outline"
-                    onClick={onReset}
-                >
-                    {test.id === 1 ? 'Пройти ещё раз' : 'Посмотреть ещё раз'}
-                </Button>
-            </Flex>
-            
-            <Box
-                bg={test.id === 1 ? 'teal.50' : 'blue.50'}
-                p={6}
-                borderRadius="lg"
-                borderLeft="4px solid"
-                borderColor={test.id === 1 ? 'teal.400' : 'blue.400'}
+    <Box>
+        <Flex justify="space-between" align="center" mb={4}>
+            <Heading size="lg" color="teal.700">
+                🎯 Ваш результат
+            </Heading>
+            <Button
+                size="sm"
+                colorScheme="teal"
+                variant="outline"
+                onClick={onReset}
             >
-                {test.id === 1 && result.selectedId ? (
-                    <Flex direction={{ base: 'column', md: 'row' }} gap={6}>
-                        <Box flex="1">
-                            <Image
-                                src={PSYCHOLOGICAL_STATE[result.selectedId - 1].src}
-                                alt="Выбранная картинка"
-                                borderRadius="lg"
-                                maxH="300px"
-                                objectFit="cover"
-                            />
-                        </Box>
-                        <Box flex="2">
-                            <Text fontSize="lg" color="gray.800" lineHeight="tall">
-                                {result.resultText}
-                            </Text>
-                        </Box>
-                    </Flex>
-                ) : test.id === 2 && result.selectedId ? (
-                    <VStack align="start" spacing={4}>
-                        <Box>
-                            <Badge colorScheme="blue" fontSize="md" mb={2}>
-                                Вы увидели:
-                            </Badge>
-                            <Heading size="md" color="gray.800">
-                                {ORGANIZM_NEEDS[result.selectedId - 1].title}
-                            </Heading>
-                        </Box>
-                        
+                {test.id === 1 ? 'Пройти ещё раз' : 'Посмотреть ещё раз'}
+            </Button>
+        </Flex>
+
+        <Box
+            bg={test.id === 1 ? 'teal.50' : 'blue.50'}
+            p={6}
+            borderRadius="lg"
+            borderLeft="4px solid"
+            borderColor={test.id === 1 ? 'teal.400' : 'blue.400'}
+        >
+            {test.id === 1 && result.selectedId ? (
+                <Flex direction={{ base: 'column', md: 'row' }} gap={6}>
+                    <Box flex="1">
+                        <Image
+                            src={PSYCHOLOGICAL_STATE[result.selectedId - 1].src}
+                            alt="Выбранная картинка"
+                            borderRadius="lg"
+                            maxH="300px"
+                            objectFit="cover"
+                        />
+                    </Box>
+                    <Box flex="2">
                         <Text fontSize="lg" color="gray.800" lineHeight="tall">
                             {result.resultText}
                         </Text>
-                        
-                        {test.src && (
-                            <Box mt={4}>
-                                <Image
-                                    src={test.src}
-                                    alt="Тест: что видите первым"
-                                    borderRadius="lg"
-                                    maxH="200px"
-                                    objectFit="cover"
-                                />
-                            </Box>
-                        )}
-                    </VStack>
-                ) : (
-                    <Text>{result.resultText}</Text>
-                )}
-            </Box>
+                    </Box>
+                </Flex>
+            ) : test.id === 2 && result.selectedId ? (
+                <VStack align="start" spacing={4}>
+                    <Box>
+                        <Badge colorScheme="blue" fontSize="md" mb={2}>
+                            Вы увидели:
+                        </Badge>
+                        <Heading size="md" color="gray.800">
+                            {ORGANIZM_NEEDS[result.selectedId - 1].title}
+                        </Heading>
+                    </Box>
+
+                    <Text fontSize="lg" color="gray.800" lineHeight="tall">
+                        {result.resultText}
+                    </Text>
+
+                    {test.src && (
+                        <Box mt={4}>
+                            <Image
+                                src={test.src}
+                                alt="Тест: что видите первым"
+                                borderRadius="lg"
+                                maxH="200px"
+                                objectFit="cover"
+                            />
+                        </Box>
+                    )}
+                </VStack>
+            ) : (
+                <Text>{result.resultText}</Text>
+            )}
         </Box>
-    );
+    </Box>
+);
 
 // Компонент карточки изображения
 const ImageCard = ({ image, onClick }: { image: ImageItem; onClick: () => void }) => (
@@ -434,9 +435,6 @@ const OptionButton = ({ option, onClick }: { option: OptionItem; onClick: () => 
         <VStack align="start" spacing={1}>
             <Text fontWeight="bold" color="gray.800">
                 {option.title}
-            </Text>
-            <Text fontSize="sm" color="gray.600" noOfLines={2}>
-                {option.desc.substring(0, 80)}...
             </Text>
         </VStack>
     </Button>
