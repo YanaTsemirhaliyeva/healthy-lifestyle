@@ -4,6 +4,8 @@ import { Autoplay, Pagination } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
 import { Banner } from '../banner/banner';
+import cornflowersImg from './images/cornflowers-2.webp';
+import pinkFlowersImg from './images/pink-flowers.webp';
 
 
 export const SwiperPromo = () => {
@@ -11,12 +13,12 @@ export const SwiperPromo = () => {
   const promoList = [
     {
       id: 1,
-      src: 'img/banner/cornflowers-2.webp',
+      src: cornflowersImg ,
       title: 'Кожная пятница - роднае сваё'
     },
         {
       id: 2,
-      src: 'img/banner/pink-flowers.webp',
+      src: pinkFlowersImg,
       title: '2026 - Год белорусской женщины'
     }
   ];
