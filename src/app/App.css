@@ -1,0 +1,93 @@
+@font-face {
+    font-style: normal;
+    font-weight: 300;
+    font-family: 'Inter';
+    font-display: swap;
+    src:
+        url('../assets/fonts/Inter-LightBETA.woff2') format('woff2'),
+        url('../assets/fonts/Inter-LightBETA.woff') format('woff');
+}
+
+@font-face {
+    font-style: normal;
+    font-weight: 400;
+    font-family: 'Inter';
+    font-display: swap;
+    src:
+        url('../assets/fonts/Inter-Regular.woff2') format('woff2'),
+        url('../assets/fonts/Inter-Regular.woff') format('woff');
+}
+
+@font-face {
+    font-style: normal;
+    font-weight: 500;
+    font-family: 'Inter';
+    font-display: swap;
+    src:
+        url('../assets/fonts/Inter-Medium.woff2') format('woff2'),
+        url('../assets/fonts/Inter-Medium.woff2') format('woff');
+}
+
+@font-face {
+    font-style: normal;
+    font-weight: 600;
+    font-family: 'Inter';
+    font-display: swap;
+    src:
+        url('../assets/fonts/Inter-SemiBold.woff2') format('woff2'),
+        url('../assets/fonts/Inter-SemiBold.woff') format('woff');
+}
+
+@font-face {
+    font-style: normal;
+    font-weight: 700;
+    font-family: 'Inter';
+    font-display: swap;
+    src:
+        url('../assets/fonts/Inter-Bold.woff2') format('woff2'),
+        url('../assets/fonts/Inter-Bold.woff') format('woff');
+}
+
+@font-face {
+    font-style: normal;
+    font-weight: 800;
+    font-family: 'Inter';
+    font-display: swap;
+    src:
+        url('../assets/fonts/Inter-ExtraBold.woff2') format('woff2'),
+        url('../assets/fonts/Inter-ExtraBold.woff') format('woff');
+}
+
+@font-face {
+    font-style: normal;
+    font-weight: 900;
+    font-family: 'Inter';
+    font-display: swap;
+    src:
+        url('../assets/fonts/Inter-Black.woff2') format('woff2'),
+        url('../assets/fonts/Inter-Black.woff') format('woff');
+}
+
+#root {
+    min-height: 100%;
+    width: 100%;
+    font-family: 'Inter', 'Arial', sans-serif;
+    line-height: 148%;
+}
+
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+button {
+    font-family: 'Inter', 'Arial', sans-serif !important;
+}
+
+main {
+    margin: 0;
+    padding: 0;
+    background-color: #fff;
+}
