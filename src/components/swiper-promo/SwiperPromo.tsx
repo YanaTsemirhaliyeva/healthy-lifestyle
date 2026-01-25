@@ -14,7 +14,7 @@ export const SwiperPromo = () => {
     {
       id: 1,
       src: cornflowersImg ,
-      title: 'Кожная пятница - роднае сваё'
+      title: 'Кожная пятница - роднае, сваё'
     },
         {
       id: 2,

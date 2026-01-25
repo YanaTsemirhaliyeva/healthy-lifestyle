@@ -23,9 +23,9 @@ export const Layout = ({ children }: LayoutProps) => (
                 {children}
             </Box>
             <Box
-                pos='fixed'
-                left='0'
-                bottom='0'
+                // pos='fixed'
+                // left='0'
+                // bottom='0'
                 w='100%'
                 minW='359px'
                 zIndex='2'

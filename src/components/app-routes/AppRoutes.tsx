@@ -5,8 +5,10 @@ import App from '~/app/App.tsx';
 import { AppRoute } from '~/consts/consts';
 import { ErrorPage } from '~/pages/error';
 import { FortuneWheel } from '~/pages/fortune-wheel';
+import { HealthyTests } from '~/pages/healthy-tests/HealthyTests';
 import { Home } from '~/pages/home';
 import { Projective } from '~/pages/projective';
+import { PsyTests } from '~/pages/psy-tests';
 
 
 export const router = createBrowserRouter(
@@ -27,6 +29,14 @@ export const router = createBrowserRouter(
                 {
                     path: AppRoute.Projective,
                     element: <Projective />
+                },
+                {
+                    path: AppRoute.Psychological,
+                    element: <PsyTests />
+                },
+                {
+                    path: AppRoute.Healthy,
+                    element: <HealthyTests />
                 },
                 {
                     path: AppRoute.NotFound,
