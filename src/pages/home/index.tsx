@@ -13,8 +13,8 @@ export const Home = () => (
                 <SwiperPromo />
             </Box>
             <Box
-                pl={{ base: '16px', xs: '20px', sm: '28px' }}
-                pr={{ xs: '20px', sm: '54px', md: '70px' }}
+                pl={{ base: '20px', xs: '24px', sm: '30px' }}
+                pr={{ xs: '20px', sm: '24px', md: '30px' }}
             >
                 <Box
                     m={{ base: '0 auto', xs: '0 auto 4px', sm: '0 auto 24px', lg: '0 auto 20px' }}

@@ -1,10 +1,10 @@
-import { Box, Container, Image, Text } from '@chakra-ui/react';
-import { Link } from "react-router";
+import { Box, Button, Container, Image, Link, Text } from '@chakra-ui/react';
 
 type Item = {
   id: number;
   src: string;
-  title: string
+  title: string;
+  link: string;
 }
 
 type BannerProps = {
@@ -32,27 +32,33 @@ export const Banner = ({ item }: BannerProps) => {
         pos='relative'
         display='flex'
         alignItems={{ base: 'center', md: isOdd ? 'flex-start' : 'flex-end' }}
-        justifyContent={isOdd ? 'flex-end' : 'flex-start' }
+        justifyContent={isOdd ? 'flex-end' : 'flex-start'}
         px={{ base: 3, md: 8 }}
         py={10}
       >
         <Box
-          maxW={{base: '300px', sm: '450px'}}
+          maxW={{ base: '300px', sm: '450px' }}
           textAlign={isOdd ? 'right' : 'left'}
         >
-          <Text fontSize={{ base: 'md', sm: '2xl' }} fontWeight='bold' mb={3}>
+          <Text fontSize={{ base: 'md', sm: '2xl' }} fontWeight='bold' mb={5} color='#053158'>
             {item.title}
           </Text>
-          <Link
-            to='#'
-            style={{
-              textDecoration: 'underline',
+          <Button
+            as={Link}
+            href={item.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            sx={{
+                  '&:hover': {
+                textDecor: 'none'
+              },
               fontSize: '16px',
-              fontWeight: '500'
+              fontWeight: '500',
             }}
+            colorScheme='blue'
           >
             Подробнее
-          </Link>
+          </Button>
         </Box>
       </Container>
     </Box>

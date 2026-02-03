@@ -14,12 +14,14 @@ export const SwiperPromo = () => {
     {
       id: 1,
       src: cornflowersImg ,
-      title: 'Кожная пятница - роднае, сваё'
+      title: 'Кожная пятница - роднае, сваё',
+      link: 'https://www.mart.gov.by/news/novost/sustrakaytse-novy-praekt-kozhnaya-pyatnitsa-rodnae-svaye-/'
     },
         {
       id: 2,
       src: pinkFlowersImg,
-      title: '2026 - Год белорусской женщины'
+      title: '2026 - Год белорусской женщины',
+      link: 'https://president.gov.by/ru/documents/ukaz-no-1-ot-1-anvara-2026-g'
     }
   ];
 
@@ -37,7 +39,7 @@ export const SwiperPromo = () => {
     >
       {promoList.length > 0 && promoList.map((item) => (
         <SwiperSlide key={item.id} data-testid='swiper'>
-          <Banner item={item}/>
+          <Banner item={item} />
         </SwiperSlide>
       ))}
     </Swiper>

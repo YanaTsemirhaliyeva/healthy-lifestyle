@@ -1,14 +1,12 @@
 import { createBrowserRouter } from 'react-router';
 
 import App from '~/app/App.tsx';
-// import { ProtectedRouteElement } from '~/components/protected-route/ProtectedRoute';
 import { AppRoute } from '~/consts/consts';
+import { Articles } from '~/pages/articles';
 import { ErrorPage } from '~/pages/error';
 import { FortuneWheel } from '~/pages/fortune-wheel';
-import { HealthyTests } from '~/pages/healthy-tests/HealthyTests';
 import { Home } from '~/pages/home';
-import { Projective } from '~/pages/projective';
-import { PsyTests } from '~/pages/psy-tests';
+import { TestsPage } from '~/pages/tests-page';
 
 
 export const router = createBrowserRouter(
@@ -27,16 +25,12 @@ export const router = createBrowserRouter(
                     element: <FortuneWheel />
                 },
                 {
-                    path: AppRoute.Projective,
-                    element: <Projective />
+                    path: AppRoute.Tests,
+                    element: <TestsPage />
                 },
                 {
-                    path: AppRoute.Psychological,
-                    element: <PsyTests />
-                },
-                {
-                    path: AppRoute.Healthy,
-                    element: <HealthyTests />
+                    path: AppRoute.Articles,
+                    element: <Articles />
                 },
                 {
                     path: AppRoute.NotFound,

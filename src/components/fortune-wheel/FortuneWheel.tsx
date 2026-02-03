@@ -1,443 +1,488 @@
 import { RepeatIcon } from '@chakra-ui/icons';
 import {
-    Badge,
-    Box,
-    Button,
-    Container,
-    Flex,
-    Heading,
-    Text,
-    useToast,
-    VStack,
+  Alert,
+  AlertDescription,
+  AlertIcon,
+  Badge,
+  Box,
+  Button,
+  Container,
+  Flex,
+  Heading,
+  Progress,
+  Text,
+  useToast,
+  VStack,
 } from '@chakra-ui/react';
 import { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router';
 
-import { AppRoute, HEALTH_PHRASES } from '~/consts/consts';
+import { WheelItemI } from '~/consts/consts';
 
-export const FortuneWheelComponent = () => {
-    const [isSpinning, setIsSpinning] = useState(false);
-    const [result, setResult] = useState<string | null>(null);
-    const [rotation, setRotation] = useState(0);
-    const [phraseHistory, setPhraseHistory] = useState<string[]>([]);
-    const canvasRef = useRef<HTMLCanvasElement>(null);
-    const toast = useToast();
+import { WheelResultModal } from './FortuneResultModal';
+import {
+  DEFAULT_WHEEL_CONFIG,
+  drawWheel,
+  WheelConfig
+} from './utils';
+import {
+  addUsedItem,
+  getRandomUnusedItem,
+  getWheelHistory,
+  getWheelStats,
+  isItemUsed,
+  resetWheelHistory
+} from './wheel-history';
 
-    // Размеры канваса
-    const CANVAS_SIZE = 500;
-    const CENTER = CANVAS_SIZE / 2;
-    const RADIUS = CANVAS_SIZE / 2 - 50;
+interface FortuneWheelProps {
+  items: WheelItemI[];
+  config?: Partial<WheelConfig>;
+  wheelId: string; // 'health', 'exercise', 'recipes'
+}
 
-    // Инициализация колеса
-    useEffect(() => {
-        drawWheel();
+export const FortuneWheelComponent = ({
+  items,
+  config = {},
+  wheelId
+}: FortuneWheelProps) => {
+  const [isSpinning, setIsSpinning] = useState(false);
+  const [result, setResult] = useState<WheelItemI | null>(null);
+  const [rotation, setRotation] = useState(0);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedModalItem, setSelectedModalItem] = useState<WheelItemI | null>(null);
+  const [selectedItemIndex, setSelectedItemIndex] = useState<number>(-1);
+  const [stats, setStats] = useState(() => {
+    const filteredItems = items.filter(item => item.category === wheelId);
+    return getWheelStats(wheelId, filteredItems);
+  });
+  const [historyItems, setHistoryItems] = useState<WheelItemI[]>([]);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const toast = useToast();
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const wheelConfig: WheelConfig = {
+    ...DEFAULT_WHEEL_CONFIG,
+    ...config,
+  };
+
+  const filteredItems = items.filter(item => item.category === wheelId);
+
+  const getCategoryIndices = (): Map<number, number> => {
+    const indicesMap = new Map<number, number>();
+    
+    // задания текущей категории по ID
+    const sortedItems = [...filteredItems].sort((a, b) => a.id - b.id);
+    
+    sortedItems.forEach((item, index) => {
+      indicesMap.set(item.id, index + 1);
+    });
+    
+    return indicesMap;
+  };
+
+  const getItemCategoryIndex = (item: WheelItemI | null): number => {
+    if (!item) return -1;
+    
+    const categoryItems = items.filter(i => i.category === item.category);
+
+    const sortedItems = [...categoryItems].sort((a, b) => a.id - b.id);
+
+    return sortedItems.findIndex(i => i.id === item.id);
+  };
+
+
+  const loadHistoryItems = () => {
+    const history = getWheelHistory(wheelId);
+    const usedItems = history.usedItemIds
+      .map(id => items.find(item => item.id === id))
+      .filter((item): item is WheelItemI => 
+        item !== undefined && item.category === wheelId
+      )
+      .reverse();
+
+    setHistoryItems(usedItems);
+  };
+
+  useEffect(() => {
+    loadHistoryItems();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [rotation]);
+  }, []); 
 
-    const drawWheel = () => {
-        const canvas = canvasRef.current;
-        if (!canvas) return;
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
 
-        const ctx = canvas.getContext('2d');
-        if (!ctx) return;
+    const categoryIndices = getCategoryIndices();
 
-        // Очищаем canvas
-        ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+    drawWheel(
+      canvas,
+      filteredItems, 
+      rotation,
+      wheelConfig,
+      (itemId) => isItemUsed(wheelId, itemId),
+      categoryIndices 
+    );
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rotation, items, wheelConfig, wheelId]); 
 
-        // Цвета для сегментов
-        const SEGMENT_COLORS = ['#E53E3E', '#38A169', '#FFFFFF'];
-        const BORDER_COLORS = ['#C53030', '#2F855A', '#E2E8F0'];
+  const spinWheelAnimation = (
+    selectedItem: WheelItemI,
+    duration: number = 3000
+  ) => {
+    const startRotation = rotation;
 
-        // Рисуем колесо
-        const sliceAngle = (2 * Math.PI) / HEALTH_PHRASES.length;
-        const halfSliceAngle = sliceAngle / 2;
+    const sliceAngle = (2 * Math.PI) / filteredItems.length;
+    const halfSliceAngle = sliceAngle / 2;
+    const pointerAngle = -Math.PI / 2;
 
-        HEALTH_PHRASES.forEach((phrase, index) => {
-            const startAngle = index * sliceAngle + rotation;
-            const endAngle = (index + 1) * sliceAngle + rotation;
+    const selectedIndex = filteredItems.findIndex(item => item.id === selectedItem.id);
+    const segmentCenter = selectedIndex * sliceAngle + halfSliceAngle;
 
-            const colorIndex = index % 3;
-            const color = SEGMENT_COLORS[colorIndex];
-            const borderColor = BORDER_COLORS[colorIndex];
+    const fullSpins = 3 + Math.floor(Math.random() * 6);
+    const targetRotation = pointerAngle - segmentCenter + fullSpins * 2 * Math.PI;
 
-            // Сегмент
-            ctx.beginPath();
-            ctx.moveTo(CENTER, CENTER);
-            ctx.arc(CENTER, CENTER, RADIUS, startAngle, endAngle);
-            ctx.closePath();
-            ctx.fillStyle = color;
-            ctx.fill();
-            ctx.strokeStyle = borderColor;
-            ctx.lineWidth = 2;
-            ctx.stroke();
+    const distance = targetRotation - startRotation;
+    const startTime = Date.now();
 
-            // Текст - радиальный (перпендикулярно радиусу)
-            ctx.save();
+    const animate = () => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
 
-            // Угол для текста (середина сегмента)
-            const textAngle = startAngle + halfSliceAngle;
+      const easeOut = 1 - Math.pow(1 - progress, 3);
+      const currentRotation = startRotation + distance * easeOut;
 
-            // Позиция текста (ближе к краю)
-            const textRadius = RADIUS - 30;
-            const x = CENTER + Math.cos(textAngle) * textRadius;
-            const y = CENTER + Math.sin(textAngle) * textRadius;
+      setRotation(currentRotation);
 
-            // Перемещаемся к позиции текста
-            ctx.translate(x, y);
-
-            ctx.rotate(textAngle + Math.PI / 2);
-            ctx.rotate(Math.PI / 2);
-
-            // Цвет текста
-            ctx.fillStyle = colorIndex === 2 ? '#2D3748' : '#FFFFFF';
-            ctx.shadowColor = colorIndex === 2 ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)';
-            ctx.shadowBlur = 2;
-
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.font = 'bold 12px Arial';
-
-            // Обрезаем текст
-            const maxLength = 20;
-            const displayText = phrase.length > maxLength
-                ? phrase.substring(0, maxLength) + '...'
-                : phrase;
-
-            // Рисуем текст
-            ctx.fillText(displayText, 45, 0);
-
-            ctx.shadowColor = 'transparent';
-            ctx.restore();
-        });
-
-        // Центр колеса
-        ctx.beginPath();
-        ctx.arc(CENTER, CENTER, 20, 0, 2 * Math.PI);
-
-        const centerGradient = ctx.createRadialGradient(
-            CENTER, CENTER, 0,
-            CENTER, CENTER, 20
-        );
-        centerGradient.addColorStop(0, '#FFFFFF');
-        centerGradient.addColorStop(1, '#CBD5E0');
-
-        ctx.fillStyle = centerGradient;
-        ctx.fill();
-
-        ctx.strokeStyle = '#718096';
-        ctx.lineWidth = 3;
-        ctx.stroke();
-
-        // === УКАЗАТЕЛЬ ВВЕРХУ ===
-        const pointerY = 30;
-
-        ctx.beginPath();
-        ctx.moveTo(CENTER, pointerY + 60);
-        ctx.lineTo(CENTER - 25, pointerY);
-        ctx.lineTo(CENTER + 25, pointerY);
-        ctx.closePath();
-
-        // ЗОЛОТОЙ градиент
-        const pointerGradient = ctx.createLinearGradient(
-            CENTER, pointerY,
-            CENTER, pointerY + 60
-        );
-        pointerGradient.addColorStop(0, '#FEFCBF');
-        pointerGradient.addColorStop(0.4, '#FAF089');
-        pointerGradient.addColorStop(0.7, '#F6E05E');
-        pointerGradient.addColorStop(1, '#D69E2E');
-
-        ctx.fillStyle = pointerGradient;
-        ctx.fill();
-
-        ctx.strokeStyle = '#B7791F';
-        ctx.lineWidth = 2;
-        ctx.stroke();
-
-        // Линия для объема
-        ctx.beginPath();
-        ctx.moveTo(CENTER, pointerY + 50);
-        ctx.lineTo(CENTER, pointerY + 10);
-        ctx.strokeStyle = 'rgba(246, 224, 94, 0.9)';
-        ctx.lineWidth = 3;
-        ctx.stroke();
-
-        // Блик
-        ctx.beginPath();
-        ctx.moveTo(CENTER, pointerY + 45);
-        ctx.lineTo(CENTER - 12, pointerY + 18);
-        ctx.lineTo(CENTER + 12, pointerY + 18);
-        ctx.closePath();
-        ctx.fillStyle = 'rgba(255, 250, 205, 0.4)';
-        ctx.fill();
-    };
-
-    const spinWheel = () => {
-        if (isSpinning) return;
-
-        setIsSpinning(true);
-        setResult(null);
-
-        // 1. Сначала выбираем случайную фразу
-        const newSelectedIndex = Math.floor(Math.random() * HEALTH_PHRASES.length);
-        const selectedPhrase = HEALTH_PHRASES[newSelectedIndex];
-
-        console.log('Выбрана фраза:', newSelectedIndex, selectedPhrase);
-
-        // 2. Рассчитываем угол для этой фразы
-        const sliceAngle = (2 * Math.PI) / HEALTH_PHRASES.length;
-        const halfSliceAngle = sliceAngle / 2;
-
-        // Указатель находится вверху (угол -π/2 = 270°)
-        const pointerAngle = -Math.PI / 2;
-
-        // Центр выбранного сегмента (без учета текущего rotation)
-        const segmentCenter = newSelectedIndex * sliceAngle + halfSliceAngle;
-
-        // Нужно, чтобы после вращения: segmentCenter + finalRotation = pointerAngle (по модулю 2π)
-        // finalRotation = pointerAngle - segmentCenter (по модулю 2π)
-
-        // Полные обороты для эффекта
-        const fullSpins = 3 + Math.floor(Math.random() * 6);
-
-        // Целевой угол вращения
-        // Мы хотим, чтобы после вращения: (segmentCenter + targetRotation) % (2π) = pointerAngle
-        // Поэтому: targetRotation = pointerAngle - segmentCenter + fullSpins * 2π
-        const targetRotation = pointerAngle - segmentCenter + fullSpins * 2 * Math.PI;
-
-        console.log('Параметры вращения:');
-        console.log('Выбранный индекс:', newSelectedIndex);
-        console.log('Центр сегмента (град):', (segmentCenter * 180 / Math.PI).toFixed(1));
-        console.log('Угол указателя (град):', (pointerAngle * 180 / Math.PI).toFixed(1));
-        console.log('Целевой rotation (град):', (targetRotation * 180 / Math.PI).toFixed(1));
-
-        // 3. Анимация
-        const startRotation = rotation;
-        const distance = targetRotation - startRotation;
-        const duration = 3000;
-        const startTime = Date.now();
-
-        const animate = () => {
-            const elapsed = Date.now() - startTime;
-            const progress = Math.min(elapsed / duration, 1);
-
-            // Easing функция
-            const easeOut = 1 - Math.pow(1 - progress, 3);
-            const currentRotation = startRotation + distance * easeOut;
-
-            setRotation(currentRotation);
-
-            if (progress < 1) {
-                requestAnimationFrame(animate);
-            } else {
-                // Проверяем, какая фраза сейчас под указателем
-                const currentPhrase = getCurrentPhraseUnderPointer();
-                console.log('После вращения под указателем:', currentPhrase);
-
-                // Показываем результат
-                setResult(selectedPhrase);
-                setPhraseHistory(prev => [selectedPhrase, ...prev.slice(0, 4)]);
-                setIsSpinning(false);
-
-                toast({
-                    title: '🎯 Ваша задача на сегодня!',
-                    description: selectedPhrase,
-                    status: 'success',
-                    duration: 5000,
-                    isClosable: true,
-                    position: 'top',
-                });
-            }
-        };
-
+      if (progress < 1) {
         requestAnimationFrame(animate);
+      } else {
+        setIsSpinning(false);
+
+        addUsedItem(wheelId, selectedItem.id);
+
+        const newStats = getWheelStats(wheelId, filteredItems);
+        setStats(newStats);
+        loadHistoryItems();
+
+        setResult(selectedItem);
+        const itemIndex = getItemCategoryIndex(selectedItem);
+        setSelectedItemIndex(itemIndex);
+        setSelectedModalItem(selectedItem);
+
+        setTimeout(() => {
+          setIsModalOpen(true);
+        }, 500);
+      }
     };
+    requestAnimationFrame(animate);
+  };
 
-    // Функция для получения текущей фразы под указателем
-    const getCurrentPhraseUnderPointer = () => {
-        const sliceAngle = (2 * Math.PI) / HEALTH_PHRASES.length;
-        const halfSliceAngle = sliceAngle / 2;
-        const pointerAngle = -Math.PI / 2;
+  const handleSpinWheel = () => {
+    if (isSpinning) return;
 
-        // Нормализуем rotation в диапазоне [0, 2π)
-        const normalizedRotation = ((rotation % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+    setIsSpinning(true);
+    setResult(null);
+    setIsModalOpen(false);
 
-        // Для каждого сегмента проверяем расстояние до указателя
-        let minDistance = Infinity;
-        let closestIndex = 0;
+    const selectedItem = getRandomUnusedItem(wheelId, filteredItems);
+    spinWheelAnimation(selectedItem);
+  };
 
-        for (let i = 0; i < HEALTH_PHRASES.length; i++) {
-            // Центр текущего сегмента с учетом rotation
-            const segmentCenter = (i * sliceAngle + halfSliceAngle + normalizedRotation) % (2 * Math.PI);
+  const handleRandomItem = () => {
+    const randomItem = getRandomUnusedItem(wheelId, filteredItems);
 
-            // Расстояние от центра сегмента до указателя
-            let distance = Math.abs(segmentCenter - pointerAngle);
+    addUsedItem(wheelId, randomItem.id);
 
-            // Учитываем круговую природу углов
-            if (distance > Math.PI) {
-                distance = 2 * Math.PI - distance;
-            }
+    const newStats = getWheelStats(wheelId, filteredItems);
+    setStats(newStats);
+    
+    loadHistoryItems();
 
-            if (distance < minDistance) {
-                minDistance = distance;
-                closestIndex = i;
-            }
-        }
+    setResult(randomItem);
+    const itemIndex = getItemCategoryIndex(randomItem);
+    setSelectedItemIndex(itemIndex);
+    setSelectedModalItem(randomItem);
+    setIsModalOpen(true);
+  };
 
-        console.log('Проверка: под указателем индекс', closestIndex,
-            'расстояние', (minDistance * 180 / Math.PI).toFixed(1), 'град');
+  const handleResetHistory = () => {
+    resetWheelHistory(wheelId);
 
-        return HEALTH_PHRASES[closestIndex];
-    };
+    const newStats = getWheelStats(wheelId, filteredItems);
+    setStats(newStats);
+    
+    setResult(null);
+    setHistoryItems([]);
 
-    const getRandomPhrase = () => {
-        const randomIndex = Math.floor(Math.random() * HEALTH_PHRASES.length);
-        const randomPhrase = HEALTH_PHRASES[randomIndex];
-        setResult(randomPhrase);
-        setPhraseHistory(prev => [randomPhrase, ...prev.slice(0, 4)]);
+    toast({
+      title: '🔄 История сброшена!',
+      description: `История для "${wheelId}" сброшена`,
+      status: 'info',
+      duration: 3000,
+      isClosable: true,
+    });
+  };
 
-        toast({
-            title: '✨ Случайная задача!',
-            description: randomPhrase,
-            status: 'info',
-            duration: 4000,
-            isClosable: true,
-        });
-    };
+  const openResultModal = (item: WheelItemI) => {
+    const itemIndex = getItemCategoryIndex(item);
+    
+    setSelectedModalItem(item);
+    setSelectedItemIndex(itemIndex);
+    setIsModalOpen(true);
+  };
 
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedModalItem(null);
+    setSelectedItemIndex(-1);
+  };
 
-    return (
-        <Container maxW="6xl" py={8}>
-            <Button as={Link} to={AppRoute.Index} mb={6} colorScheme="teal" variant="outline">
-                ← Назад к тестам
+  return (
+    <>
+      <Container maxW="6xl" py={8}>
+        {/* <Button as={Link} to={AppRoute.Index} mb={6} colorScheme="blue" variant="outline">
+          ← На главную
+        </Button> */}
+
+        <VStack spacing={8} align="center">
+          <Heading color="blue.700" textAlign="center">
+            🎡 Колесо Фортуны - {wheelId === 'health' ? 'ЗОЖ' :
+              wheelId === 'exercise' ? 'Упражнения' :
+                'Рецепты ПП'}
+          </Heading>
+
+          {/* Прогресс выполнения */}
+          <Box w="100%" maxW="2xl">
+            <Flex justify="space-between" mb={2}>
+              <Text fontWeight="bold" color="gray.700">
+                Прогресс в этой категории:
+              </Text>
+              <Text fontWeight="bold" color={stats.completionPercentage === 100 ? 'green.500' : 'blue.500'}>
+                {stats.completionPercentage}% ({stats.usedItems}/{stats.totalItems})
+              </Text>
+            </Flex>
+            <Progress
+              value={stats.completionPercentage}
+              colorScheme={stats.completionPercentage === 100 ? 'green' : 'blue'}
+              size="lg"
+              borderRadius="full"
+              mb={3}
+            />
+
+            {stats.needReset ? (
+              <Alert status="success" borderRadius="md">
+                <AlertIcon />
+                <AlertDescription>
+                  🎉 Поздравляем! Вы получили все задания в этой категории.
+                </AlertDescription>
+              </Alert>
+            ) : stats.availableItems === 1 ? (
+              <Alert status="info" borderRadius="md">
+                <AlertIcon />
+                <AlertDescription>
+                  ⚠️ Осталось всего 1 задание в этой категории!
+                </AlertDescription>
+              </Alert>
+            ) : null}
+          </Box>
+
+          {/* Колесо */}
+          <Box position="relative">
+            <canvas
+              ref={canvasRef}
+              width={wheelConfig.size}
+              height={wheelConfig.size}
+              style={{
+                maxWidth: '100%',
+                height: 'auto',
+                filter: isSpinning ? 'brightness(1.1)' : 'none',
+                transition: 'filter 0.3s',
+              }}
+            />
+          </Box>
+
+          {/* Текущий результат (если есть) */}
+          {result && (
+            <Box
+              w="100%"
+              maxW="2xl"
+              bg="green.50"
+              p={6}
+              borderRadius="lg"
+              borderWidth={2}
+              borderColor="green.200"
+              textAlign="center"
+              cursor="pointer"
+              onClick={() => openResultModal(result)}
+              _hover={{
+                bg: 'green.100',
+                transition: 'all 0.3s'
+              }}
+            >
+              <Flex align="center" justify="center" mb={3}>
+                <Badge colorScheme="green" fontSize="md" mr={3}>
+                  🔥 Текущее
+                </Badge>
+                <Heading size="lg" color="green.700">
+                  Ваш результат:
+                </Heading>
+              </Flex>
+              <Text fontSize="xl" fontWeight="bold" color="green.800">
+                Задание #{selectedItemIndex + 1}: {result.title}
+              </Text>
+              <Text mt={3} color="gray.600" fontSize="sm">
+                Нажмите, чтобы посмотреть подробности
+              </Text>
+            </Box>
+          )}
+
+          {/* Кнопки управления */}
+          <Flex gap={4} wrap="wrap" justify="center">
+            <Button
+              colorScheme="blue"
+              size="lg"
+              onClick={handleSpinWheel}
+              isLoading={isSpinning}
+              loadingText="Крутится..."
+              leftIcon={<RepeatIcon />}
+              isDisabled={isSpinning}
+            >
+              Крутить колесо!
             </Button>
 
-            <VStack spacing={8} align="center">
-                <Heading color="teal.600" textAlign="center">
-                    🎡 Колесо ЗОЖ Фортуны
-                </Heading>
+            <Button
+              colorScheme="blue"
+              size="lg"
+              variant="outline"
+              onClick={handleRandomItem}
+              isDisabled={isSpinning}
+            >
+              Случайная задача
+            </Button>
 
-                <Text color="gray.600" textAlign="center" maxW="2xl">
-                    Крутите колесо, чтобы получить случайную задачу для поддержания здорового образа жизни!
-                    Выполняйте выпавшие задания каждый день для улучшения самочувствия.
-                </Text>
+            <Button
+              colorScheme="orange"
+              size="lg"
+              variant="ghost"
+              onClick={handleResetHistory}
+              isDisabled={isSpinning}
+            >
+              Сбросить историю
+            </Button>
+          </Flex>
 
-                {/* Статистика */}
-                <Flex gap={4} wrap="wrap" justify="center">
-                    <Badge colorScheme="green" fontSize="lg" p={2}>
-                        Всего заданий: {HEALTH_PHRASES.length}
+          {/* История выпавших заданий */}
+          {historyItems.length > 0 && (
+            <Box w="100%" maxW="2xl" mt={8}>
+              <Heading size="md" mb={4} color="gray.700">
+                📜 История выпавших заданий:
+              </Heading>
+              <VStack align="stretch" spacing={3}>
+                {/* Текущий результат (уже отображается выше, но можно дублировать) */}
+                {result && result.id !== historyItems[0]?.id && (
+                  <Flex
+                    bg="blue.50"
+                    p={4}
+                    borderRadius="md"
+                    borderLeftWidth={4}
+                    borderLeftColor="blue.400"
+                    align="center"
+                    cursor="pointer"
+                    onClick={() => openResultModal(result)}
+                    _hover={{ bg: 'blue.100' }}
+                  >
+                    <Badge colorScheme="blue" mr={3}>
+                      🔥 Текущее
                     </Badge>
-                    <Badge colorScheme="blue" fontSize="lg" p={2}>
-                        История: {phraseHistory.length}
+                    <Badge colorScheme="blue" mr={3}>
+                      #{getItemCategoryIndex(result) + 1}
                     </Badge>
-                    <Badge colorScheme="purple" fontSize="lg" p={2}>
-                        🎯 Попробуйте все!
-                    </Badge>
-                </Flex>
-
-                {/* Колесо */}
-                <Box position="relative">
-                    <canvas
-                        ref={canvasRef}
-                        width={CANVAS_SIZE}
-                        height={CANVAS_SIZE}
-                        style={{
-                            maxWidth: '100%',
-                            height: 'auto',
-                            filter: isSpinning ? 'brightness(1.1)' : 'none',
-                            transition: 'filter 0.3s',
-                        }}
-                    />
-                </Box>
-
-                {/* Результат */}
-                {result && (
-                    <Box
-                        bg="green.50"
-                        p={6}
-                        borderRadius="lg"
-                        borderWidth={2}
-                        borderColor="green.200"
-                        maxW="2xl"
-                        textAlign="center"
-                    >
-                        <Heading size="lg" color="green.700" mb={3}>
-                            🎉 Ваша задача:
-                        </Heading>
-                        <Text fontSize="xl" fontWeight="bold" color="green.800">
-                            {result}
-                        </Text>
-                        <Text mt={3} color="gray.600">
-                            Постарайтесь выполнить это задание сегодня!
-                        </Text>
-                    </Box>
-                )}
-
-                {/* Кнопки управления */}
-                <Flex gap={4} wrap="wrap" justify="center">
-                    <Button
-                        colorScheme="teal"
-                        size="lg"
-                        onClick={spinWheel}
-                        isLoading={isSpinning}
-                        loadingText="Крутится..."
-                        leftIcon={<RepeatIcon />}
-                        isDisabled={isSpinning}
-                    >
-                        Крутить колесо!
-                    </Button>
-
-                    <Button
-                        colorScheme="blue"
-                        size="lg"
-                        variant="outline"
-                        onClick={getRandomPhrase}
-                        isDisabled={isSpinning}
-                    >
-                        Случайная задача
-                    </Button>
-                </Flex>
-
-                {/* История заданий */}
-                {phraseHistory.length > 0 && (
-                    <Box w="100%" maxW="2xl" mt={8}>
-                        <Heading size="md" mb={4} color="gray.700">
-                            📜 История заданий:
-                        </Heading>
-                        <VStack align="stretch" spacing={2}>
-                            {phraseHistory.map((phrase, index) => (
-                                <Flex
-                                    key={index}
-                                    bg={index === 0 ? 'blue.50' : 'gray.50'}
-                                    p={3}
-                                    borderRadius="md"
-                                    borderLeftWidth={4}
-                                    borderLeftColor={index === 0 ? 'blue.400' : 'gray.300'}
-                                    align="center"
-                                >
-                                    <Text fontWeight={index === 0 ? 'bold' : 'normal'} color="gray.700">
-                                        {index === 0 ? '🔥 Текущее: ' : `#${index + 1}: `}
-                                        {phrase}
-                                    </Text>
-                                </Flex>
-                            ))}
-                        </VStack>
-                    </Box>
-                )}
-
-                {/* Подсказки */}
-                <Box bg="yellow.50" p={4} borderRadius="lg" maxW="2xl">
-                    <Heading size="sm" mb={2} color="yellow.700">
-                        💡 Советы:
-                    </Heading>
-                    <Text color="gray.700">
-                        1. Крутите колесо утром, чтобы определить задачу на день<br />
-                        2. Выполняйте задания последовательно<br />
-                        3. Отмечайте выполненные задачи в календаре<br />
-                        4. Поделитесь задачей с друзьями для мотивации
+                    <Text fontWeight="bold" color="gray.700" flex={1}>
+                      {result.title}
                     </Text>
-                </Box>
-            </VStack>
-        </Container>
-    );
+                  </Flex>
+                )}
+
+                {/* Остальная история */}
+                {historyItems.map((item, index) => {
+                  const itemIndex = getItemCategoryIndex(item);
+                  return (
+                    <Flex
+                      key={`${item.id}-${index}`}
+                      bg={index === 0 && result?.id !== item.id ? 'gray.50' : 'gray.50'}
+                      p={3}
+                      borderRadius="md"
+                      borderLeftWidth={4}
+                      borderLeftColor={index === 0 && result?.id !== item.id ? 'blue.300' : 'gray.300'}
+                      align="center"
+                      cursor="pointer"
+                      onClick={() => openResultModal(item)}
+                      _hover={{ bg: 'gray.100' }}
+                    >
+                      <Badge
+                        colorScheme="gray"
+                        mr={3}
+                        opacity={0.7}
+                      >
+                        #{historyItems.length - index}
+                      </Badge>
+                      <Badge
+                        colorScheme="blue"
+                        mr={3}
+                      >
+                        Задание {itemIndex + 1}
+                      </Badge>
+                      <Text
+                        color="gray.700"
+                        flex={1}
+                        fontSize={index === 0 && result?.id !== item.id ? 'md' : 'sm'}
+                        fontWeight={index === 0 && result?.id !== item.id ? '500' : 'normal'}
+                      >
+                        {item.title}
+                      </Text>
+                    </Flex>
+                  );
+                })}
+              </VStack>
+
+              {/* Статистика внизу истории */}
+              <Flex
+                justify="space-between"
+                mt={4}
+                p={3}
+                bg="blue.50"
+                borderRadius="md"
+              >
+                <Text fontSize="sm" color="gray.600">
+                  Всего выпало: <Badge colorScheme="blue">{historyItems.length}</Badge>
+                </Text>
+                <Text fontSize="sm" color="gray.600">
+                  Осталось: <Badge colorScheme="purple">{stats.availableItems}</Badge>
+                </Text>
+              </Flex>
+            </Box>
+          )}
+
+          {/* Сообщение если история пуста */}
+          {historyItems.length === 0 && !result && (
+            <Box w="100%" maxW="2xl" mt={8} p={6} bg="gray.50" borderRadius="lg" textAlign="center">
+              <Text color="gray.600" mb={3}>
+                🎯 Покрутите колесо, чтобы получить первое задание!
+              </Text>
+              <Text fontSize="sm" color="gray.500">
+                Здесь будет отображаться история всех выпавших заданий
+              </Text>
+            </Box>
+          )}
+        </VStack>
+      </Container>
+
+      {/* Модальное окно для просмотра задания */}
+      <WheelResultModal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        item={selectedModalItem}
+        itemIndex={selectedItemIndex}
+      />
+    </>
+  );
 };

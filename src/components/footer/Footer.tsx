@@ -3,13 +3,13 @@ import { Box, Flex } from "@chakra-ui/react";
 export const Footer = () => (
     <Box
         as='footer'
-        bgColor='lime.100'
+        bgColor='#bfcdf9'
         width='100%'
         minW='359px'
         sx={{
             boxShadow: {
-                base: '0 -3px 6px rgba(225, 255, 148, 0.6)',
-                md: '0 -5px 12px rgba(225, 255, 148, 0.7)'
+                base: '0 -3px 6px rgb(82 121 251 / 40%)',
+                sm: '0 -5px 12px rgb(187 202 251 / 40%)'
             }
         }}
     >
@@ -23,7 +23,7 @@ export const Footer = () => (
             fontWeight={500}
             opacity={0.8}
         >
-             Контент носит развлекательный характер <br/>
+             Контент носит развлекательный характер. Создано с помощью ИИ <br/>
             © {new Date().getFullYear()}. Все права защищены.
         </Flex>
     </Box>
