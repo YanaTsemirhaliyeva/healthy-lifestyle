@@ -14,7 +14,7 @@ export const Layout = ({ children }: LayoutProps) => (
         <Header />
         <Box
             as='main'
-            pt={{ base: '82px', sm: '56px' }}
+            pt={{ base: '52px', sm: '56px' }}
             pb={{ base: '110px', md: '80px' }}
             display='flex'
             flexDir='column'

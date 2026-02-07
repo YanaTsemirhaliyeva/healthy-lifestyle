@@ -1,36 +1,24 @@
-import { Box, Button, Container, Heading, Text, VStack } from '@chakra-ui/react';
+import { Box, Button, Container, Heading, Show, Text, VStack } from '@chakra-ui/react';
 import { Link } from 'react-router';
 
 import { WheelTabs } from '~/components/fortune-wheel/WheelTabs';
 import { AppRoute } from '~/consts/consts';
 
 export const FortuneWheel = () => (
-  <Container maxW="7xl" py={8} pos='relative' zIndex={1}>
+  <Container maxW="7xl" py={8} pos='relative' zIndex={2} px={{ base: 1, xs: 4 }}>
     <Button as={Link} to={AppRoute.Index} mb={6} colorScheme="blue" variant="outline">
       ← На главную
     </Button>
     <VStack spacing={8} align="stretch">
       <Box textAlign="center">
         <Heading color="blue.700" mb={4}>
-          🎡 Колесо Фортуны для ЗОЖ
+          🎡 Колесо Фортуны<Show below='xs'><br /></Show> для ЗОЖ
         </Heading>
         <Text color="blue.600" maxW="3xl" mx="auto" fontWeight={600} fontSize={18}>
           Выберите категорию, крутите колесо и получайте полезные задания на день!
           Подробности откроются автоматически после остановки колеса.
         </Text>
       </Box>
-
-      <Box
-        bg="white"
-        borderRadius="xl"
-        boxShadow="lg"
-        p={{ base: 4, md: 6 }}
-        borderWidth={1}
-        borderColor="gray.100"
-      >
-        <WheelTabs />
-      </Box>
-
       <Box mt={8}>
         <Heading size="md" mb={4} color="gray.700">
           💡 Как пользоваться:
@@ -51,6 +39,17 @@ export const FortuneWheel = () => (
             <Text>6. <b>Повторите</b> - крутите колесо каждый день для новых задач!</Text>
           </VStack>
         </Box>
+      </Box>
+
+      <Box
+        bg="white"
+        borderRadius="xl"
+        boxShadow="lg"
+        p={{ base: 4, md: 6 }}
+        borderWidth={1}
+        borderColor="gray.100"
+      >
+        <WheelTabs />
       </Box>
     </VStack>
   </Container>

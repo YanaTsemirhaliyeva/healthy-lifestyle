@@ -3,7 +3,8 @@ export enum AppRoute {
     NotFound = '/not-found',
     Fortune = '/fortune-wheel',
     Tests = '/tests',
-    Articles = '/articles'
+    Articles = '/articles',
+    Videos = '/videos'
 }
 
 export const DynamicRoutes = {
@@ -34,10 +35,10 @@ export const TEST_BLOCK_THEMES = [
     },
     {
         id: 4,
-        title: 'Тесты на здоровый образ жизни (ЗОЖ)',
-        desc: 'Опросники и анкеты, оценивающие привычки (питание, активность, сон) и риски заболеваний, часто называемые «оценкой образа жизни» (lifestyle assessment). Они помогают выявить вредные привычки и определить степень приверженности ЗОЖ.',
-        src: 'img/test-block/woman-2.jpg',
-        route: AppRoute.Index
+        title: 'Говорящие овощи',
+        desc: 'AI-анимация: овощи с юмором рассказывают о своей пользе для здоровья. Забавные короткие ролики о питательных веществах и научных фактах.',
+        src: 'img/test-block/veg.png',
+        route: AppRoute.Videos
     },
 ]
 
@@ -648,6 +649,7 @@ export const TEST_DATA = [
         title: 'Психологическое состояние',
         desc: 'Тест на проверку психологического состояния',
         category: 'psy',
+        type: 'standard',
         questions: [
             {
                 id: 0,
@@ -816,6 +818,7 @@ export const TEST_DATA = [
         title: 'Образ жизни',
         desc: 'Тест на проверку здорового образа жизни',
         category: 'lifestyle',
+        type: 'standard',
         questions: [
             {
                 id: 0,
@@ -1010,6 +1013,7 @@ export const TEST_DATA = [
         title: 'Конфликтность',
         desc: 'Тест на проверку уровня конфликтности',
         category: 'psy',
+        type: 'standard',
         questions: [
             {
                 id: 0,
@@ -1074,6 +1078,7 @@ export const TEST_DATA = [
         title: 'Работоспособность',
         desc: 'Тест на проверку работоспособности',
         category: 'productivity',
+        type: 'standard',
         questions: [
             {
                 id: 0,
@@ -1138,6 +1143,7 @@ export const TEST_DATA = [
         title: 'Умственные способности',
         desc: 'Тест на проверку умственных способностей — 30 вопросов',
         category: 'intellect',
+        type: 'standard',
         questions: [
             {
                 id: 0,
@@ -1452,6 +1458,7 @@ export const TEST_DATA = [
         title: 'Внимательность',
         desc: 'Тест на проверку внимательности',
         category: 'intellect',
+        type: 'standard',
         questions: [
             {
                 id: 0,
@@ -1546,6 +1553,7 @@ export const TEST_DATA = [
         title: 'Физические способности',
         desc: 'Тест на проверку физических способностей',
         category: 'fitness',
+        type: 'standard',
         questions: [
             {
                 id: 0,
@@ -1684,6 +1692,7 @@ export const TEST_DATA = [
         title: 'Воображение',
         desc: 'Тест на проверку воображения',
         category: 'creativity',
+        type: 'standard',
         questions: [
             {
                 id: 0,
@@ -1798,6 +1807,7 @@ export const TEST_DATA = [
         title: 'Логика',
         desc: 'Тест на проверку логики',
         category: 'intellect',
+        type: 'standard',
         questions: [
             {
                 id: 0,
@@ -1911,6 +1921,7 @@ export const TEST_DATA = [
         id: 9,
         title: 'Сила воли',
         desc: 'Тест на проверку силы воли',
+        type: 'standard',
         category: 'psy',
         questions: [
             {

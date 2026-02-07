@@ -238,10 +238,7 @@ export const FortuneWheelComponent = ({
 
   return (
     <>
-      <Container maxW="6xl" py={8}>
-        {/* <Button as={Link} to={AppRoute.Index} mb={6} colorScheme="blue" variant="outline">
-          ← На главную
-        </Button> */}
+      <Container maxW="6xl" py={8} px={0}>
 
         <VStack spacing={8} align="center">
           <Heading color="blue.700" textAlign="center">
@@ -318,7 +315,7 @@ export const FortuneWheelComponent = ({
                 transition: 'all 0.3s'
               }}
             >
-              <Flex align="center" justify="center" mb={3}>
+              <Flex align="center" justify="center" mb={3} flexWrap={{base: 'wrap', xs: 'nowrap'}}>
                 <Badge colorScheme="green" fontSize="md" mr={3}>
                   🔥 Текущее
                 </Badge>
@@ -327,7 +324,7 @@ export const FortuneWheelComponent = ({
                 </Heading>
               </Flex>
               <Text fontSize="xl" fontWeight="bold" color="green.800">
-                Задание #{selectedItemIndex + 1}: {result.title}
+                Задание #{getItemCategoryIndex(result) + 1}: {result.title}
               </Text>
               <Text mt={3} color="gray.600" fontSize="sm">
                 Нажмите, чтобы посмотреть подробности
@@ -377,7 +374,6 @@ export const FortuneWheelComponent = ({
                 📜 История выпавших заданий:
               </Heading>
               <VStack align="stretch" spacing={3}>
-                {/* Текущий результат (уже отображается выше, но можно дублировать) */}
                 {result && result.id !== historyItems[0]?.id && (
                   <Flex
                     bg="blue.50"

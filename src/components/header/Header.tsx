@@ -2,6 +2,7 @@ import {
     Box,
     Flex,
     Image,
+    Show,
     Text,
 } from '@chakra-ui/react';
 
@@ -49,14 +50,14 @@ export const Header = () =>
         >
             <Text
                 fontWeight={800}
-                fontSize={{ base: 16, sm: 22 }}
+                fontSize={{ base: 15, sm: 22 }}
                 color='white'
                 textAlign='center'
                 textShadow='2px 2px 4px rgba(0,0,0,0.8)'
                 lineHeight='148%'
                 textTransform='uppercase'
             >
-                Здоровый дух в здоровом теле: <br/>белорусские статистики выбирают ЗОЖ
+                Здоровый дух <Show below='xs'><br/></Show>в здоровом теле: <br/>белорусские статистики<Show below='xs'><br/></Show> выбирают ЗОЖ
             </Text>
         </Flex>
     </Box>

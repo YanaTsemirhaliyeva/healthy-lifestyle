@@ -1,16 +1,24 @@
+import { HamburgerIcon } from "@chakra-ui/icons";
 import {
     Badge,
     Box,
     Button,
     Container,
     Divider,
+    Drawer,
+    DrawerBody,
+    DrawerCloseButton,
+    DrawerContent,
+    DrawerHeader,
+    DrawerOverlay,
     Flex,
     Heading,
     Text,
     useColorModeValue,
+    useDisclosure,
     VStack
 } from "@chakra-ui/react";
-import { useEffect, useRef, useState } from "react";
+import {  useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
 
 import { AppRoute } from "~/consts/consts";
@@ -20,6 +28,8 @@ import { Article, ARTICLES_DATA } from "./articles-data";
 export const Articles = () => {
     const [selectedArticle, setSelectedArticle] = useState<Article | null>(ARTICLES_DATA[0]);
     const articleRef = useRef<HTMLDivElement>(null);
+    const { isOpen, onOpen, onClose } = useDisclosure();
+    const btnRef = useRef<HTMLButtonElement>(null);
 
     const sidebarBg = useColorModeValue("gray.50", "gray.800");
     const articleBg = useColorModeValue("white", "gray.900");
@@ -46,6 +56,7 @@ export const Articles = () => {
 
     const handleArticleSelect = (article: Article) => {
         setSelectedArticle(article);
+        onClose(); // Закрываем модальное окно после выбора статьи
     };
 
     const getCategoryTitle = (category: string): string => {
@@ -108,8 +119,85 @@ export const Articles = () => {
         );
     };
 
+    // Компонент сайдбара для повторного использования
+    const SidebarContent = () => (
+        <VStack align="stretch" spacing={3}>
+            <Button
+                onClick={() => handleArticleSelect(ARTICLES_DATA[0])}
+                justifyContent="flex-start"
+                leftIcon={<span>📚</span>}
+                variant={selectedArticle?.id === 0 ? "solid" : "ghost"}
+                colorScheme={selectedArticle?.id === 0 ? "blue" : "gray"}
+                bg={selectedArticle?.id === 0 ? activeButtonBg : "transparent"}
+                _hover={{ bg: buttonHoverBg }}
+                size="lg"
+            >
+                <Text flex={1} textAlign="left">Предисловие</Text>
+            </Button>
+
+            <Divider my={2} />
+
+            {/* Кнопки по категориям */}
+            {Object.entries(categories).map(([category, articles]) => (
+                <Box key={category}>
+                    <Text
+                        fontSize="sm"
+                        fontWeight="semibold"
+                        color="gray.500"
+                        mb={2}
+                        pl={2}
+                    >
+                        {getCategoryTitle(category)}
+                    </Text>
+                    <VStack spacing={1} align="stretch">
+                        {articles.map((article) => (
+                            <Button
+                                key={article.id}
+                                onClick={() => handleArticleSelect(article)}
+                                justifyContent="flex-start"
+                                leftIcon={<span>{article.icon}</span>}
+                                variant={selectedArticle?.id === article.id ? "solid" : "ghost"}
+                                colorScheme={selectedArticle?.id === article.id ? "blue" : "gray"}
+                                bg={selectedArticle?.id === article.id ? activeButtonBg : "transparent"}
+                                _hover={{ bg: buttonHoverBg }}
+                                size="md"
+                                pl={6}
+                            >
+                                <Text
+                                    flex={1}
+                                    textAlign="left"
+                                    fontSize="sm"
+                                    noOfLines={1}
+                                >
+                                    {article.title}
+                                </Text>
+                            </Button>
+                        ))}
+                    </VStack>
+                </Box>
+            ))}
+
+            {/* Статистика внизу сайдбара */}
+            <Box
+                mt={6}
+                p={3}
+                bg="blue.50"
+                borderRadius="md"
+                borderWidth="1px"
+                borderColor="blue.100"
+            >
+                <Text fontSize="sm" fontWeight="bold" color="blue.700" mb={1}>
+                    Всего статей:
+                </Text>
+                <Text fontSize="sm" color="gray.600">
+                    {ARTICLES_DATA.length} материалов, основанных на исследованиях
+                </Text>
+            </Box>
+        </VStack>
+    );
+
     return (
-        <Container maxW="7xl" py={8} pos='relative' zIndex={1}>
+        <Container maxW="7xl" py={8} pos='relative' zIndex={1} px={{ base: 2, xs: 4 }}>
             <Button as={Link} to={AppRoute.Index} mb={6} colorScheme="blue" variant="outline">
                 ← На главную
             </Button>
@@ -126,7 +214,39 @@ export const Articles = () => {
                 gap={6}
                 minH="600px"
             >
-                {/* Сайдбар с категориями */}
+                {/* Кнопка открытия модального окна на мобильных */}
+                <Box display={{ base: "block", md: "none" }} mb={4}>
+                    <Button
+                        ref={btnRef}
+                        onClick={onOpen}
+                        leftIcon={<HamburgerIcon />}
+                        colorScheme="blue"
+                        variant="outline"
+                        w="full"
+                    >
+                        Выбрать статью
+                    </Button>
+                </Box>
+
+                {/* Модальное окно для мобильных */}
+                <Drawer
+                    isOpen={isOpen}
+                    placement="left"
+                    onClose={onClose}
+                >
+                    <DrawerOverlay />
+                    <DrawerContent>
+                        <DrawerCloseButton />
+                        <DrawerHeader>
+                            {/* Категории статей */}
+                        </DrawerHeader>
+                        <DrawerBody p={4}>
+                            <SidebarContent />
+                        </DrawerBody>
+                    </DrawerContent>
+                </Drawer>
+
+                {/* Сайдбар для десктопа */}
                 <Box
                     w={{ base: "100%", md: "300px" }}
                     bg={sidebarBg}
@@ -136,85 +256,9 @@ export const Articles = () => {
                     position="sticky"
                     top="24px"
                     alignSelf="flex-start"
+                    display={{ base: "none", md: "block" }}
                 >
-                    <VStack align="stretch" spacing={3}>
-                        <Text fontWeight="bold" fontSize="lg" mb={2}>
-                            Категории статей
-                        </Text>
-
-                        {/* Кнопка предисловия */}
-                        <Button
-                            onClick={() => handleArticleSelect(ARTICLES_DATA[0])}
-                            justifyContent="flex-start"
-                            leftIcon={<span>📚</span>}
-                            variant={selectedArticle?.id === 0 ? "solid" : "ghost"}
-                            colorScheme={selectedArticle?.id === 0 ? "blue" : "gray"}
-                            bg={selectedArticle?.id === 0 ? activeButtonBg : "transparent"}
-                            _hover={{ bg: buttonHoverBg }}
-                            size="lg"
-                        >
-                            <Text flex={1} textAlign="left">Предисловие</Text>
-                        </Button>
-
-                        <Divider my={2} />
-
-                        {/* Кнопки по категориям */}
-                        {Object.entries(categories).map(([category, articles]) => (
-                            <Box key={category}>
-                                <Text
-                                    fontSize="sm"
-                                    fontWeight="semibold"
-                                    color="gray.500"
-                                    mb={2}
-                                    pl={2}
-                                >
-                                    {getCategoryTitle(category)}
-                                </Text>
-                                <VStack spacing={1} align="stretch">
-                                    {articles.map((article) => (
-                                        <Button
-                                            key={article.id}
-                                            onClick={() => handleArticleSelect(article)}
-                                            justifyContent="flex-start"
-                                            leftIcon={<span>{article.icon}</span>}
-                                            variant={selectedArticle?.id === article.id ? "solid" : "ghost"}
-                                            colorScheme={selectedArticle?.id === article.id ? "blue" : "gray"}
-                                            bg={selectedArticle?.id === article.id ? activeButtonBg : "transparent"}
-                                            _hover={{ bg: buttonHoverBg }}
-                                            size="md"
-                                            pl={6}
-                                        >
-                                            <Text
-                                                flex={1}
-                                                textAlign="left"
-                                                fontSize="sm"
-                                                noOfLines={1}
-                                            >
-                                                {article.title}
-                                            </Text>
-                                        </Button>
-                                    ))}
-                                </VStack>
-                            </Box>
-                        ))}
-                    </VStack>
-
-                    {/* Статистика внизу сайдбара */}
-                    <Box
-                        mt={6}
-                        p={3}
-                        bg="blue.50"
-                        borderRadius="md"
-                        borderWidth="1px"
-                        borderColor="blue.100"
-                    >
-                        <Text fontSize="sm" fontWeight="bold" color="blue.700" mb={1}>
-                            Всего статей:
-                        </Text>
-                        <Text fontSize="sm" color="gray.600">
-                            {ARTICLES_DATA.length} материалов, основанных на исследованиях
-                        </Text>
-                    </Box>
+                    <SidebarContent />
                 </Box>
 
                 {/* Основное содержание статьи */}
@@ -242,7 +286,7 @@ export const Articles = () => {
                                                 {selectedArticle.title}
                                             </Heading>
                                         </Flex>
-                                        <Flex align="center" gap={4}>
+                                        <Flex align="center" gap={4} flexWrap="wrap">
                                             {selectedArticle.source && (
                                                 <Text fontSize="sm" color="gray.500">
                                                     Источник: {selectedArticle.source}

@@ -7,35 +7,25 @@ import { FortuneWheelComponent } from './FortuneWheel';
 export const WheelTabs = () => (
     <Tabs variant="enclosed" colorScheme="blue" isLazy>
       <TabList>
-        <Tab fontWeight="bold">🎯 ЗОЖ Задачи</Tab>
-        {/* <Tab fontWeight="bold">💪 Упражнения</Tab> */}
-        <Tab fontWeight="bold">🥗 Рецепты ПП</Tab>
+        <Tab fontWeight="bold" px={2}>🎯 ЗОЖ Задачи</Tab>
+        <Tab fontWeight="bold" px={2}>🥗 Рецепты ПП</Tab>
       </TabList>
 
       <TabPanels>
-        <TabPanel>
-          <Box p={4}>
+        <TabPanel px={0}>
+          <Box py={4}>
             <FortuneWheelComponent 
               items={getHealthPhrases()}
-              wheelId="health" // Уникальный ID для ЗОЖ колеса
+              wheelId="health" 
             />
           </Box>
         </TabPanel>
         
-        {/* <TabPanel>
-          <Box p={4}>
-            <FortuneWheelComponent 
-              items={getExercisePhrases()}
-              wheelId="exercise" // Уникальный ID для упражнений
-            />
-          </Box>
-        </TabPanel> */}
-        
-        <TabPanel>
-          <Box p={4}>
+        <TabPanel px={0}>
+          <Box py={4}>
             <FortuneWheelComponent 
               items={getRecipePhrases()}
-              wheelId="recipes" // Уникальный ID для рецептов
+              wheelId="recipes"
             />
           </Box>
         </TabPanel>

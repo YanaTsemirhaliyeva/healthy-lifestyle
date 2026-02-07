@@ -269,9 +269,9 @@ export const StandardTestView: React.FC<StandardTestViewProps> = ({ test, onComp
 
             {/* Информация о текущем вопросе */}
             <Flex justify="space-between" align="center">
-                <Badge colorScheme="blue" fontSize="sm" px={3} py={1} borderRadius="md">
+                {/* <Badge colorScheme="blue" fontSize="sm" px={3} py={1} borderRadius="md">
                     Вопрос {currentQuestion + 1} из {test.questions?.length}
-                </Badge>
+                </Badge> */}
                 {selectedAnswerId !== undefined && (
                     <Badge colorScheme="green" fontSize="xs" px={2} py={1}>
                         ✓ Отвечен
@@ -305,6 +305,7 @@ export const StandardTestView: React.FC<StandardTestViewProps> = ({ test, onComp
                     onClick={handlePrev}
                     isDisabled={currentQuestion === 0}
                     flex="1"
+                    py={2}
                 >
                     ← Предыдущий
                 </Button>
@@ -315,6 +316,7 @@ export const StandardTestView: React.FC<StandardTestViewProps> = ({ test, onComp
                     onClick={handleNext}
                     isDisabled={currentQuestion === (test.questions?.length || 0) - 1}
                     flex="1"
+                    py={2}
                 >
                     Следующий →
                 </Button>
@@ -324,13 +326,14 @@ export const StandardTestView: React.FC<StandardTestViewProps> = ({ test, onComp
                     onClick={calculateResults}
                     isDisabled={!allQuestionsAnswered}
                     flex="2"
+                    py={2}
                 >
                     {allQuestionsAnswered ? 'Завершить тест' : `Отвечено: ${Object.keys(answers).length}/${test.questions?.length}`}
                 </Button>
             </Stack>
 
             {/* Панель навигации по вопросам */}
-            <Box mt={6}>
+            <Box mt={4}>
                 <Text fontSize="sm" color="gray.600" mb={3}>
                     Навигация по вопросам:
                 </Text>
@@ -393,12 +396,12 @@ export const StandardTestView: React.FC<StandardTestViewProps> = ({ test, onComp
             </Box>
 
             {/* Инструкция */}
-            <Alert status="info" borderRadius="md" mt={4} fontSize="sm">
+            {/* <Alert status="info" borderRadius="md" mt={4} fontSize="sm">
                 <AlertIcon />
                 {selectedAnswerId === undefined
                     ? `Выберите ответ на вопрос ${currentQuestion + 1}`
                     : `Ответ на вопрос ${currentQuestion + 1} сохранен. Можете изменить его или перейти к другим вопросам.`}
-            </Alert>
+            </Alert> */}
         </VStack>
     );
 };

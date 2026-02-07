@@ -1,7 +1,6 @@
 import {
     Box,
     Heading,
-    HStack,
     Modal,
     ModalBody,
     ModalCloseButton,
@@ -45,19 +44,19 @@ export const TestDetailModal: React.FC<TestDetailModalProps> = ({
             scrollBehavior="inside"
         >
             <ModalOverlay />
-            <ModalContent maxH="90vh" borderRadius="xl">
+            <ModalContent maxH="95vh" borderRadius="xl" mt={5}>
                 <ModalHeader>
-                    <VStack align="start" spacing={2}>
+                    {/* <VStack align="start" spacing={2}>
                         <HStack>
                             <Heading size="lg" mr={4}>{test.title}</Heading>
                         </HStack>
                         <Text color="gray.600">{test.desc}</Text>
-                    </VStack>
+                    </VStack> */}
                 </ModalHeader>
 
                 <ModalCloseButton size="lg" />
 
-                <ModalBody pb={8}>
+                <ModalBody pb={8} mt={2}>
                     <Tabs variant="enclosed" colorScheme="blue">
                         <TabList>
                             <Tab>Пройти тест</Tab>

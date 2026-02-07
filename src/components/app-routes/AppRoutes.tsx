@@ -7,6 +7,7 @@ import { ErrorPage } from '~/pages/error';
 import { FortuneWheel } from '~/pages/fortune-wheel';
 import { Home } from '~/pages/home';
 import { TestsPage } from '~/pages/tests-page';
+import { VideoPage } from '~/pages/video';
 
 
 export const router = createBrowserRouter(
@@ -31,6 +32,10 @@ export const router = createBrowserRouter(
                 {
                     path: AppRoute.Articles,
                     element: <Articles />
+                },
+                {
+                    path: AppRoute.Videos,
+                    element: <VideoPage />
                 },
                 {
                     path: AppRoute.NotFound,

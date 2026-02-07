@@ -229,9 +229,9 @@ export const ProjectiveTestView: React.FC<ProjectiveTestViewProps> = ({ test }) 
             </Box>
 
             {/* Вопрос */}
-            <Heading size="lg" color="gray.800">
+            {/* <Heading size="lg" color="gray.800">
                 {question.question}
-            </Heading>
+            </Heading> */}
 
             {/* Содержимое теста */}
             {test.type === 'image-grid' ? (
