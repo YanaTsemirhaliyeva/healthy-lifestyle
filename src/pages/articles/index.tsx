@@ -16,9 +16,10 @@ import {
     Text,
     useColorModeValue,
     useDisclosure,
+    useMediaQuery,
     VStack
 } from "@chakra-ui/react";
-import {  useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
 
 import { AppRoute } from "~/consts/consts";
@@ -30,6 +31,9 @@ export const Articles = () => {
     const articleRef = useRef<HTMLDivElement>(null);
     const { isOpen, onOpen, onClose } = useDisclosure();
     const btnRef = useRef<HTMLButtonElement>(null);
+
+    // Проверяем, это десктопная версия (ширина >= 768px)
+    const [isDesktop] = useMediaQuery("(min-width: 768px)");
 
     const sidebarBg = useColorModeValue("gray.50", "gray.800");
     const articleBg = useColorModeValue("white", "gray.900");
@@ -46,17 +50,32 @@ export const Articles = () => {
         }, {});
 
     useEffect(() => {
-        if (articleRef.current) {
+        // Скроллим только на десктопе и когда выбрана новая статья (не первая загрузка)
+        if (articleRef.current && isDesktop) {
             articleRef.current.scrollIntoView({
                 behavior: 'smooth',
                 block: 'start'
             });
         }
-    }, [selectedArticle]);
+    }, [selectedArticle, isDesktop]); // Добавляем isDesktop в зависимости
 
     const handleArticleSelect = (article: Article) => {
+        const prevArticleId = selectedArticle?.id;
         setSelectedArticle(article);
         onClose(); // Закрываем модальное окно после выбора статьи
+
+        // Скроллим только на десктопе и если это не первая загрузка страницы
+        if (isDesktop && prevArticleId !== undefined) {
+            // Небольшая задержка для гарантии, что статья уже отрендерилась
+            setTimeout(() => {
+                if (articleRef.current) {
+                    articleRef.current.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            }, 50);
+        }
     };
 
     const getCategoryTitle = (category: string): string => {
@@ -145,7 +164,7 @@ export const Articles = () => {
                         fontWeight="semibold"
                         color="gray.500"
                         mb={2}
-                        pl={2}
+                        pl={1}
                     >
                         {getCategoryTitle(category)}
                     </Text>
@@ -161,7 +180,7 @@ export const Articles = () => {
                                 bg={selectedArticle?.id === article.id ? activeButtonBg : "transparent"}
                                 _hover={{ bg: buttonHoverBg }}
                                 size="md"
-                                pl={6}
+                                pl={3}
                             >
                                 <Text
                                     flex={1}
@@ -240,7 +259,7 @@ export const Articles = () => {
                         <DrawerHeader>
                             {/* Категории статей */}
                         </DrawerHeader>
-                        <DrawerBody p={4}>
+                        <DrawerBody py={4} px={1}>
                             <SidebarContent />
                         </DrawerBody>
                     </DrawerContent>

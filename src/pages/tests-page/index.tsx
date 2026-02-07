@@ -104,7 +104,7 @@ export const TestsPage = () => {
                 </Box>
 
                 {/* Фильтры и поиск */}
-                <Grid templateColumns={{ base: '1fr', md: '1fr 2fr' }} gap={6}>
+                <Grid templateColumns={{ base: '1fr', md: '1fr 2fr' }} gap={6} px={1}>
                     <GridItem>
                         <InputGroup>
                             <InputLeftElement>

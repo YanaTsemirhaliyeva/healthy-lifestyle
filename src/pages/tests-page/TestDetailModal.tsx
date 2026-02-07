@@ -56,7 +56,7 @@ export const TestDetailModal: React.FC<TestDetailModalProps> = ({
 
                 <ModalCloseButton size="lg" />
 
-                <ModalBody pb={8} mt={2}>
+                <ModalBody pb={8} mt={2} px={{base: 2, xs: 6}}>
                     <Tabs variant="enclosed" colorScheme="blue">
                         <TabList>
                             <Tab>Пройти тест</Tab>
@@ -66,7 +66,7 @@ export const TestDetailModal: React.FC<TestDetailModalProps> = ({
 
                         <TabPanels>
                             {/* Вкладка с тестом */}
-                            <TabPanel>
+                            <TabPanel px={{base: 1, xs: 4}}>
                                 {isProjective ? (
                                     <ProjectiveTestView test={test} />
                                 ) : (
@@ -75,7 +75,7 @@ export const TestDetailModal: React.FC<TestDetailModalProps> = ({
                             </TabPanel>
 
                             {/* Вкладка с описанием */}
-                            <TabPanel>
+                            <TabPanel px={{base: 1, xs: 4}}>
                                 <VStack align="start" spacing={4}>
                                     <Box>
                                         <Heading size="sm" mb={2}>О тесте</Heading>
@@ -113,7 +113,7 @@ export const TestDetailModal: React.FC<TestDetailModalProps> = ({
 
                             {/* Вкладка с результатами - показываем только если есть результаты */}
                             {test.results && test.results.length > 0 && (
-                                <TabPanel>
+                                <TabPanel px={{base: 1, xs: 4}}>
                                     <VStack spacing={4} align="stretch">
                                         {test.results.map((result: TestResult, index: number) => (
                                             <Box
