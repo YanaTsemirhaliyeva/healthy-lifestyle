@@ -12,7 +12,7 @@ export const Home = () => (
             <Box maxW='100%' mb={8}>
                 <SwiperPromo />
             </Box>
-            <Box px={{ base: 1, xs: 4 }} >
+            <Box px={{ base: 1, xs: 4 }}>
                 <Box
                     m={{ base: '0 auto', xs: '0 auto 4px', sm: '0 auto 24px', lg: '0 auto 20px' }}
                     maxW={{ base: '500px', sm: '5xl' }}

@@ -5,8 +5,8 @@ import { WheelTabs } from '~/components/fortune-wheel/WheelTabs';
 import { AppRoute } from '~/consts/consts';
 
 export const FortuneWheel = () => (
-  <Container maxW="7xl" py={8} pos='relative' zIndex={2} px={{ base: 1, xs: 4 }}>
-    <Button as={Link} to={AppRoute.Index} mb={6} colorScheme="blue" variant="outline">
+  <Container maxW="7xl" py={8} pos='relative' zIndex={2} px={{ base: 0, xs: 4 }}>
+    <Button as={Link} to={AppRoute.Index} mb={6} colorScheme="blue" variant="outline" ml={{ base: 2, xs: 0 }}>
       ← На главную
     </Button>
     <VStack spacing={8} align="stretch">

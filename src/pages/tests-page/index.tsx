@@ -63,10 +63,10 @@ export const TestsPage = () => {
     };
 
     return (
-        <Container maxW="7xl" py={{ base: 2, sm: 8 }} zIndex={1}>
+        <Container maxW="7xl" py={{ base: 2, sm: 8 }} zIndex={1} px={{ base: 0, xs: 4 }} >
             {/* Заголовок */}
             <VStack spacing={6} align="stretch" mb={10}>
-                <Button as={Link} to={AppRoute.Index} mb={6} colorScheme="blue" variant="outline" mr='auto'>
+                <Button as={Link} to={AppRoute.Index} mb={6} colorScheme="blue" variant="outline" mr='auto' ml={{ base: 2, xs: 0 }}>
                     ← На главную
                 </Button>
                 <Box>

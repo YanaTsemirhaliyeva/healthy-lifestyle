@@ -103,7 +103,7 @@ export const VideoPage = () => {
   };
 
   return (
-    <Container maxW="7xl" py={8} px={{base: 1, xs: 4}}>
+    <Container maxW="7xl" py={8} px={{base: 0, xs: 4}}>
       <Button 
         as={Link} 
         to={AppRoute.Index} 
@@ -111,6 +111,7 @@ export const VideoPage = () => {
         colorScheme="blue" 
         variant="outline"
         leftIcon={<Text>←</Text>}
+        ml={{ base: 2, xs: 0 }}
       >
         На главную
       </Button>

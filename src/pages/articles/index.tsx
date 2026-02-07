@@ -197,8 +197,8 @@ export const Articles = () => {
     );
 
     return (
-        <Container maxW="7xl" py={8} pos='relative' zIndex={1} px={{ base: 2, xs: 4 }}>
-            <Button as={Link} to={AppRoute.Index} mb={6} colorScheme="blue" variant="outline">
+        <Container maxW="7xl" py={8} pos='relative' zIndex={1} px={{ base: 0, xs: 4 }}>
+            <Button as={Link} to={AppRoute.Index} mb={6} colorScheme="blue" variant="outline" ml={{ base: 2, xs: 0 }}>
                 ← На главную
             </Button>
             <Box textAlign="center">
